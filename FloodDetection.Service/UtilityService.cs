@@ -1,4 +1,16 @@
-﻿namespace FloodDetection.Service
+﻿/******************************************************************************
+ *                          © 2022 Interfuze                               *
+ *                          All Rights Reserved.                              *
+ *                                                                            *
+ ******************************************************************************
+ *
+ * Modification History:
+ * Task#    Dev     Date        Description
+ * 
+ * 1001     AKS     21Jan22     Utility service class
+ *****************************************************************************/
+
+namespace FloodDetection.Service
 {
     /// <summary>
     /// Interbal class for Utility Service

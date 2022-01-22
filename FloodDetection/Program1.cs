@@ -2,10 +2,11 @@
 using FloodDetection.Service;
 using FloodDetection.Service.ServiceInterface;
 using Microsoft.Extensions.DependencyInjection;
+
 /// <summary>
-/// 
+/// Class to depict the use of Dependency injection
 /// </summary>
-public class Program1
+public class Program
 {
     #region Private variables
 
@@ -18,13 +19,13 @@ public class Program1
     /// <summary>
     /// PSVM
     /// </summary>
-    public static void Main1()
+    public static void Main()
     {
         DateTime startTime = DateTime.Parse("06-05-2020  9:00:00 AM");
         int threshHold = 4;
 
         //Get the current directory
-        string dataFileFolderName = @"C:\Users\Singh_anj\source\repos\FloodDetection\FloodDetection\Data"; // We can get this from config file as well
+        string dataFileFolderName = Path.Combine(System.IO.Directory.GetCurrentDirectory(), @"..\..\..\Data"); //@"C:\Users\Singh_anj\source\repos\FloodDetection\FloodDetection\Data"; // We can get this from config file as well
 
         var deviceDataFile = Path.Combine(dataFileFolderName, _deviceDataFile);
 
@@ -35,19 +36,24 @@ public class Program1
 
         var services = new ServiceCollection();
 
+        //Passing the parameters to constructors while creating the the service instance
         services.AddSingleton<IDataFileReadingService>(new DataFileReadingService(deviceDataFile, readingDataFileList));
 
+        //Injecting the IDataFileReadingService to RainfallReadingService
         services.AddSingleton<IRainfallReadingService>(p => new RainfallReadingService(p.GetService<IDataFileReadingService>()));
 
+        //Build the providers
         var provider = services.BuildServiceProvider();
 
-        var demoService = provider.GetRequiredService<IRainfallReadingService>();
+        //Get the Rainfall reading service from DI provier
+        var objRainFallReadingService = provider.GetRequiredService<IRainfallReadingService>();
+        objRainFallReadingService.ReadDataFiles();
 
-        List<RainFallTrend> rainTrends = demoService.GetRainFallTrends(startTime, threshHold);
+        List<RainFallTrend> rainTrends = objRainFallReadingService.GetRainFallTrends(startTime, threshHold);
 
         foreach (RainFallTrend rainFallTrend in rainTrends)
         {
-            Console.WriteLine(rainFallTrend.DeviceName + "\t" + rainFallTrend.Time + "\t" + rainFallTrend.Trend);
+            Console.WriteLine(rainFallTrend.DeviceName + "\t" + rainFallTrend.Time + "\t" + rainFallTrend.TrendColor + "\t" + rainFallTrend.Trend);
         }
 
         Console.ReadKey();

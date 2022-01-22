@@ -7,7 +7,7 @@
  * Modification History:
  * Task#    Dev     Date        Description
  * 
- * 1001     AKS     21Jan22     Created the Service interface for rain fall trends
+ * 1001     AKS     21Jan22     Created the Service interface for reading the data files
  *****************************************************************************/
 
 namespace FloodDetection.Service.ServiceInterface

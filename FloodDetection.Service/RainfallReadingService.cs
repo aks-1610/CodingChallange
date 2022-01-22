@@ -78,13 +78,16 @@ namespace FloodDetection.Service
 
             foreach (Device device in devices)
             {
+                //Improving the performance by narrowing the rainfall reading list
                 var rainReadings = readings.Where(x => x.DeviceId == device.Id).OrderBy(x => x.Time).ToList();
+
                 if (null != rainReadings && rainReadings.Count > 0)
                 {
                     RainFallTrend rainFallTrend = new RainFallTrend()
                     {
                         DeviceName = device.Name,
                         Location = device.Location,
+                        Trend = "-",
                     };
 
                     startTime = intialStartTime;
@@ -92,6 +95,8 @@ namespace FloodDetection.Service
                     String time = String.Concat(startTime, " - ", startTime.AddHours(iThreshhold)).ToString();
                     int avgRainfall = 0;
                     int totalThreshHoldCount = 1;
+                    string strTrend = String.Empty;
+
                     foreach (RainfallReading reading in rainReadings)
                     {
                         if (reading.Time >= startTime && reading.Time <= startTime.AddHours(iThreshhold))
@@ -125,11 +130,43 @@ namespace FloodDetection.Service
                     rainFallTrendsList.Add(rainFallTrend);
                 }
             }
+
+            //Evaluate the trends
+            EvaluateTrends(rainFallTrendsList);
+
             return rainFallTrendsList;
         }
 
+        /// <summary>
+        /// Function for evaluating the trend
+        /// </summary>
+        /// <param name="rainFallTrendsList">List of RainFallTrend</param>
+        public void EvaluateTrends(List<RainFallTrend> rainFallTrendsList)
+        {
+            int iPreviousRain = 0;
+            string strDeviceName = string.Empty;
+            foreach (RainFallTrend rainFallTrend in rainFallTrendsList)
+            {
+                if (String.IsNullOrWhiteSpace(strDeviceName) || strDeviceName != rainFallTrend.DeviceName)
+                {
+                    strDeviceName = rainFallTrend.DeviceName;
+                    iPreviousRain = rainFallTrend.Rain;
+                    continue;
+                }
+
+                if (iPreviousRain > rainFallTrend.Rain)
+                {
+                    rainFallTrend.Trend = "Decreasing";
+                }
+                else if (iPreviousRain < rainFallTrend.Rain)
+                {
+                    rainFallTrend.Trend = "Increasing";
+                }
+
+                iPreviousRain = rainFallTrend.Rain;
+            }
+        }
     }
 
     #endregion
-
 }

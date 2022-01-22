@@ -1,9 +1,10 @@
 ﻿using FloodDetection.Models;
 using FloodDetection.Service;
+
 /// <summary>
-/// 
+/// Simple service calling class
 /// </summary>
-public class Program
+public class Program2
 {
     #region Private variables
 
@@ -16,13 +17,13 @@ public class Program
     /// <summary>
     /// PSVM
     /// </summary>
-    public static void Main()
+    public static void Main1()
     {
         DateTime startTime = DateTime.Parse("06-05-2020  9:00:00 AM");
         int threshHold = 4;
 
         //Get the current directory
-        string dataFileFolderName = @"C:\Users\Singh_anj\source\repos\FloodDetection\FloodDetection\Data"; // We can get this from config file as well
+        string dataFileFolderName = Path.Combine(System.IO.Directory.GetCurrentDirectory(), @"..\..\..\Data"); //@"C:\Users\Singh_anj\source\repos\FloodDetection\FloodDetection\Data"; // We can get this from config file as well
 
         var deviceDataFile = Path.Combine(dataFileFolderName, _deviceDataFile);
 
@@ -44,7 +45,7 @@ public class Program
 
             foreach (RainFallTrend rainFallTrend in rainTrends)
             {
-                Console.WriteLine(rainFallTrend.DeviceName + "\t" + rainFallTrend.Time + "\t" + rainFallTrend.Trend);
+                Console.WriteLine(rainFallTrend.DeviceName + "\t" + rainFallTrend.Time + "\t" + rainFallTrend.TrendColor + "\t" + rainFallTrend.Trend);
             }
         }
         else

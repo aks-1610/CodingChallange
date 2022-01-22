@@ -7,7 +7,7 @@
  * Modification History:
  * Task#    Dev     Date        Description
  * 
- * 1001     AKS     21Jan22     Created the Model class for device
+ * 1001     AKS     21Jan22     Created the Model class for Rainfall reading
  *****************************************************************************/
 
 namespace FloodDetection.Models

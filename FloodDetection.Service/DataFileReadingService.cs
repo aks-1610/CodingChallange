@@ -7,7 +7,7 @@
  * Modification History:
  * Task#    Dev     Date        Description
  * 
- * 1001     AKS     21Jan22     Created the Service class for the device
+ * 1001     AKS     21Jan22     Created the Service class for the reading data files
  *****************************************************************************/
 
 namespace FloodDetection.Service

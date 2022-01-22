@@ -30,12 +30,12 @@ namespace FloodDetection.Models
         public int Rain { get; set; }
 
         /// <summary>
-        /// Gets or Sets Trend
+        /// Gets or Sets TrendColor
         /// </summary>
-        public string Trend
+        public string TrendColor
         {
             get
-            {
+            {   //Values can be moved to Enum
                 string returnTrend = string.Empty;
                 if (Rain <= 10)
                 {
@@ -54,6 +54,11 @@ namespace FloodDetection.Models
             }
             private set { }
         }
+
+        /// <summary>
+        /// Gets or Sets Trend
+        /// </summary>
+        public string Trend { get; set; }
 
         /// <summary>
         /// Gets or Sets Time range
