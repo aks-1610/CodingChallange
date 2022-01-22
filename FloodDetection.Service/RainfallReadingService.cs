@@ -22,15 +22,22 @@ namespace FloodDetection.Service
     {
         #region Private members
 
-        /// <summary>
-        /// variable to hold data file path
-        /// </summary>
-        private readonly List<Device> devices;
-        private readonly List<RainfallReading> readings;
+        private List<Device> devices;
+        private List<RainfallReading> readings;
+        private readonly IDataFileReadingService? dataFileReadingService;
 
         #endregion
 
         #region public Constructor
+
+        /// <summary>
+        /// Constructor to initialize the local variables
+        /// </summary>
+        /// <param name="dataFileReadingService">IDataFileReadingService</param>
+        public RainfallReadingService(IDataFileReadingService dataFileReadingService)
+        {
+            this.dataFileReadingService = dataFileReadingService;
+        }
 
         /// <summary>
         /// Constructor to initialize the local variables
@@ -41,11 +48,22 @@ namespace FloodDetection.Service
         {
             this.devices = Devices;
             this.readings = RainfallReadings;
+
+            dataFileReadingService = null;
         }
 
         #endregion
 
         #region Public functions
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ReadDataFiles()
+        {
+            this.devices = dataFileReadingService.GetDeviceList();
+            this.readings = dataFileReadingService.GetRainfallReading();
+        }
 
         /// <summary>
         ///  GetRainFallTrends
@@ -56,58 +74,61 @@ namespace FloodDetection.Service
         public List<RainFallTrend> GetRainFallTrends(DateTime startTime, int iThreshhold)
         {
             DateTime intialStartTime = startTime;
-            List<RainFallTrend> rainFallTrends1 = new List<RainFallTrend>();
-            //Dictionary<string, RainFallTrend> rainFallTrends = new Dictionary<string, RainFallTrend>();
+            List<RainFallTrend> rainFallTrendsList = new List<RainFallTrend>();
 
             foreach (Device device in devices)
             {
-                RainFallTrend rainFallTrend = new RainFallTrend()
+                var rainReadings = readings.Where(x => x.DeviceId == device.Id).OrderBy(x => x.Time).ToList();
+                if (null != rainReadings && rainReadings.Count > 0)
                 {
-                    DeviceName = device.Name,
-                    Location = device.Location,
-                };
-
-                startTime = intialStartTime;
-
-                String time = String.Concat(startTime, " - ", startTime.AddHours(iThreshhold)).ToString();
-                int avgRainfall = 0;
-
-                foreach (RainfallReading reading in readings)
-                {
-                    if (reading.DeviceId == device.Id && reading.Time >= startTime && reading.Time <= startTime.AddHours(iThreshhold))
+                    RainFallTrend rainFallTrend = new RainFallTrend()
                     {
-                        avgRainfall += reading.Reading;
-                    }
-                    else if (reading.Time > startTime.AddHours(iThreshhold))
-                    {
-                        rainFallTrend.Rain = avgRainfall;
-                        rainFallTrend.Time = time;
-                        rainFallTrends1.Add(rainFallTrend);
+                        DeviceName = device.Name,
+                        Location = device.Location,
+                    };
 
-                        rainFallTrend = new RainFallTrend()
+                    startTime = intialStartTime;
+
+                    String time = String.Concat(startTime, " - ", startTime.AddHours(iThreshhold)).ToString();
+                    int avgRainfall = 0;
+                    int totalThreshHoldCount = 1;
+                    foreach (RainfallReading reading in rainReadings)
+                    {
+                        if (reading.Time >= startTime && reading.Time <= startTime.AddHours(iThreshhold))
                         {
-                            DeviceName = device.Name,
-                            Location = device.Location,
-                        };
+                            avgRainfall += reading.Reading;
+                            totalThreshHoldCount++;
+                        }
+                        else if (reading.Time > startTime.AddHours(iThreshhold))
+                        {
+                            rainFallTrend.Rain = avgRainfall / totalThreshHoldCount;
+                            rainFallTrend.Time = time;
+                            rainFallTrendsList.Add(rainFallTrend);
 
-                        startTime = reading.Time;
+                            rainFallTrend = new RainFallTrend()
+                            {
+                                DeviceName = device.Name,
+                                Location = device.Location,
+                            };
 
-                        time = String.Concat(startTime, " - ", startTime.AddHours(iThreshhold)).ToString(); ;
+                            startTime = reading.Time;
 
-                        //avgRainfall = 0;
+                            time = String.Concat(startTime, " - ", startTime.AddHours(iThreshhold)).ToString(); ;
+
+                            avgRainfall = reading.Reading;
+                            totalThreshHoldCount = 1;
+                        }
                     }
-                }
 
-                rainFallTrend.Rain = avgRainfall;
-                rainFallTrend.Time = time;
-                rainFallTrends1.Add(rainFallTrend);
+                    rainFallTrend.Rain = avgRainfall / totalThreshHoldCount;
+                    rainFallTrend.Time = time;
+                    rainFallTrendsList.Add(rainFallTrend);
+                }
             }
-            return rainFallTrends1;
+            return rainFallTrendsList;
         }
 
     }
-
-
 
     #endregion
 

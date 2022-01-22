@@ -29,7 +29,8 @@ namespace FloodDetection.Service
         /// <summary>
         /// variable to hold data file path
         /// </summary>
-        private readonly string _dataFilePath;
+        private readonly string _deviceDataFilePath;
+        private readonly List<string> _dataFilePathList;
 
         #endregion
 
@@ -39,9 +40,11 @@ namespace FloodDetection.Service
         /// Constructor to initialize the local variables
         /// </summary>
         /// <param name="DeviceFilePath">string</param>
-        public DataFileReadingService(string DataFilePath)
+        /// <param name="DataFilePathList">List of string</param>
+        public DataFileReadingService(string DataFilePath, List<string> DataFilePathList)
         {
-            this._dataFilePath = DataFilePath;
+            this._deviceDataFilePath = DataFilePath;
+            _dataFilePathList = DataFilePathList;
         }
 
         #endregion
@@ -57,7 +60,7 @@ namespace FloodDetection.Service
             List<Device> deviceList;
 
             //Check if file path is valid
-            if (!UtilityService.IsPathValid(_dataFilePath))
+            if (!UtilityService.IsPathValid(_deviceDataFilePath))
             {
                 throw new Exception("File path is not valid");
             }
@@ -70,7 +73,7 @@ namespace FloodDetection.Service
                     IgnoreBlankLines = false,
                 };
 
-                using (var reader = new StreamReader(_dataFilePath))
+                using (var reader = new StreamReader(_deviceDataFilePath))
                 {
                     using (var csv = new CsvReader(reader, config))
                     {
@@ -107,45 +110,46 @@ namespace FloodDetection.Service
         /// <returns>List of RainfallReading</returns>
         public List<RainfallReading> GetRainfallReading()
         {
-            List<RainfallReading> rainfallReadingList;
+            List<RainfallReading>? rainfallReadingList = new List<RainfallReading>();
 
-            //Check if file path is valid
-            if (!UtilityService.IsPathValid(_dataFilePath))
+            foreach (string strDataFilePath in _dataFilePathList)
             {
-                throw new Exception("File path is not valid");
-            }
-            else
-            {
-                rainfallReadingList = new List<RainfallReading>();
-
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                //Check if file path is valid
+                if (!UtilityService.IsPathValid(strDataFilePath))
                 {
-                    IgnoreBlankLines = false,
-                };
-
-                using (var reader = new StreamReader(_dataFilePath))
+                    throw new Exception("File path is not valid");
+                }
+                else
                 {
-                    using (var csv = new CsvReader(reader, config))
+                    var config = new CsvConfiguration(CultureInfo.InvariantCulture)
                     {
-                        csv.Context.RegisterClassMap<RainfallReadingMap>();
+                        IgnoreBlankLines = false,
+                    };
 
-                        var isHeader = true;
-                        while (csv.Read())
+                    using (var reader = new StreamReader(strDataFilePath))
+                    {
+                        using (var csv = new CsvReader(reader, config))
                         {
-                            if (isHeader)
-                            {
-                                csv.ReadHeader();
-                                isHeader = false;
-                                continue;
-                            }
+                            csv.Context.RegisterClassMap<RainfallReadingMap>();
 
-                            if (string.IsNullOrEmpty(csv.GetField(0)))
+                            var isHeader = true;
+                            while (csv.Read())
                             {
-                                isHeader = true;
-                                continue;
-                            }
+                                if (isHeader)
+                                {
+                                    csv.ReadHeader();
+                                    isHeader = false;
+                                    continue;
+                                }
 
-                            rainfallReadingList.Add(csv.GetRecord<RainfallReading>());
+                                if (string.IsNullOrEmpty(csv.GetField(0)))
+                                {
+                                    isHeader = true;
+                                    continue;
+                                }
+
+                                rainfallReadingList.Add(csv.GetRecord<RainfallReading>());
+                            }
                         }
                     }
                 }

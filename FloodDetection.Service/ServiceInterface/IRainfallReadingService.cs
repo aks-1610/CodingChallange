@@ -5,7 +5,7 @@ namespace FloodDetection.Service.ServiceInterface
     /// <summary>
     /// Service interface for rain fall trends
     /// </summary>
-    internal interface IRainfallReadingService
+    public interface IRainfallReadingService
     {
         /// <summary>
         ///  GetRainFallTrends

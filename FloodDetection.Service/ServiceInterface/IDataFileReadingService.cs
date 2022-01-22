@@ -17,7 +17,7 @@ namespace FloodDetection.Service.ServiceInterface
     /// <summary>
     /// Service interface for reading data files
     /// </summary>
-    internal interface IDataFileReadingService
+    public interface IDataFileReadingService
     {
         /// <summary>
         /// Function to get the device List
