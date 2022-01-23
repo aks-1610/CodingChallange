@@ -4,7 +4,7 @@ using FloodDetection.Service;
 /// <summary>
 /// Simple service calling class
 /// </summary>
-public class Program2
+public class Program
 {
     #region Private variables
 
@@ -17,7 +17,7 @@ public class Program2
     /// <summary>
     /// PSVM
     /// </summary>
-    public static void Main1()
+    public static void Main()
     {
         DateTime startTime = DateTime.Parse("06-05-2020  9:00:00 AM");
         int threshHold = 4;

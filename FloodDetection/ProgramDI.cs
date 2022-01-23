@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 /// <summary>
 /// Class to depict the use of Dependency injection
 /// </summary>
-public class Program
+public class ProgramDI
 {
     #region Private variables
 
@@ -19,7 +19,7 @@ public class Program
     /// <summary>
     /// PSVM
     /// </summary>
-    public static void Main()
+    public static void MainDI()
     {
         DateTime startTime = DateTime.Parse("06-05-2020  9:00:00 AM");
         int threshHold = 4;
